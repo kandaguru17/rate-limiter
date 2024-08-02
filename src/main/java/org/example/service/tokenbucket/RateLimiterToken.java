@@ -6,6 +6,15 @@ public class RateLimiterToken {
 
     private long lastUpdatedNano;
 
+    public RateLimiterToken(int i, long nanoTime) {
+        this.count = i;
+        this.lastUpdatedNano = nanoTime;
+    }
+
+    public RateLimiterToken() {
+
+    }
+
     public int getCount() {
         return count;
     }

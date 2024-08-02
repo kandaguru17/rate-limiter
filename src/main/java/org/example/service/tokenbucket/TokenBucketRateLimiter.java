@@ -30,6 +30,7 @@ public class TokenBucketRateLimiter implements RateLimiter {
         Objects.requireNonNull(request);
         Lock lock = locks.computeIfAbsent(request.getIpAddress(), (k) -> new ReentrantLock());
         try {
+            // same instance aana vera thread
             lock.lock();
             return rateLimit(request);
         } finally {
@@ -37,8 +38,9 @@ public class TokenBucketRateLimiter implements RateLimiter {
         }
     }
 
+
     private boolean rateLimit(RequestContext request) {
-        RateLimiterToken token = tokenRepository.getToken(request.getIpAddress());
+        RateLimiterToken token = tokenRepository.getToken(request.getIpAddress()); //123
         long now = System.nanoTime();
         if (token == null) {
             token = new RateLimiterToken();
@@ -46,11 +48,22 @@ public class TokenBucketRateLimiter implements RateLimiter {
         }
         // refill token
         refillToken(token, now);
+
         if (token.getCount() <= 0) return false;
-        token.setCount(token.getCount() - 1);
-        tokenRepository.save(request.getIpAddress(), token);
+//        token.setCount(token.getCount() - 1);  //123
+//        tokenRepository.save(request.getIpAddress(), token);
+        tokenRepository.getAndDecrement(request.getIpAddress());
         return true;
     }
+
+
+    // t1 -- > x - 0
+    // t2 -->  x - 0
+
+    // t2 --> t2 ==> x - 1 --> true
+    // t1 --> ==> x - 1    --> false
+
+
 
     private void refillToken(RateLimiterToken token, long now) {
         long elapsedTime = now - token.getLastUpdatedNano();

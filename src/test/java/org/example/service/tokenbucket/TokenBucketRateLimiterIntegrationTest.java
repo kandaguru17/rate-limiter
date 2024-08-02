@@ -60,5 +60,10 @@ public class TokenBucketRateLimiterIntegrationTest {
         @Override
         public void save(String ipAddress, RateLimiterToken token) {
         }
+
+        @Override
+        public void getAndDecrement(String ipAddress) {
+
+        }
     }
 }
