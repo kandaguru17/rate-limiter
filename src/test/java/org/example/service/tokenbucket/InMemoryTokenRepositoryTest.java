@@ -9,10 +9,8 @@ class InMemoryTokenRepositoryTest {
 
     @Test
     void shouldSaveAndRetrieveToken(){
-        RateLimiterToken rateLimiterToken = new RateLimiterToken();
-        rateLimiterToken.setCount(2);
+        RateLimiterToken rateLimiterToken = new RateLimiterToken(2, System.nanoTime());
         InMemoryTokenRepository repository = new InMemoryTokenRepository();
-
         repository.save(IP_ADDRESS,rateLimiterToken);
 
         RateLimiterToken token = repository.getToken(IP_ADDRESS);

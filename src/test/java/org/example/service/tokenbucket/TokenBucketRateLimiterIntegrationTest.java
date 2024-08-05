@@ -54,7 +54,7 @@ public class TokenBucketRateLimiterIntegrationTest {
 
         @Override
         public RateLimiterToken getToken(String ipAddress) {
-            return new RateLimiterToken();
+            return new RateLimiterToken(1, System.nanoTime());
         }
 
         @Override

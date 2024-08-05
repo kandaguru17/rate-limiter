@@ -1,33 +1,27 @@
 package org.example.service.tokenbucket;
 
-public class RateLimiterToken {
+public final class RateLimiterToken {
 
-    private int count;
+    private final int count;
 
-    private long lastUpdatedNano;
+    private final long lastUpdatedNano;
 
-    public RateLimiterToken(int i, long nanoTime) {
-        this.count = i;
-        this.lastUpdatedNano = nanoTime;
+     RateLimiterToken() {
+        this.count = 2;
+        this.lastUpdatedNano= System.nanoTime();
     }
 
-    public RateLimiterToken() {
-
+    public RateLimiterToken(int count, long lastUpdatedNano) {
+        this.count = count;
+        this.lastUpdatedNano = lastUpdatedNano;
     }
 
     public int getCount() {
         return count;
     }
 
-    public void setCount(int count) {
-        this.count = count;
-    }
-
     public long getLastUpdatedNano() {
         return lastUpdatedNano;
     }
 
-    public void setLastUpdatedNano(long nano) {
-        this.lastUpdatedNano = nano;
-    }
 }

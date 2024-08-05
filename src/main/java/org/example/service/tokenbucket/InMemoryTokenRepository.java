@@ -11,26 +11,30 @@ public class InMemoryTokenRepository implements TokenRepository {
     @Override
     public RateLimiterToken getToken(String ipAddress) {
         AtomicReference<RateLimiterToken> atomicReference = tokenStore.get(ipAddress);
-        return atomicReference == null ? null: atomicReference.get();
+        return atomicReference == null ? null : atomicReference.get();
     }
 
     @Override
     public void save(String ipAddress, RateLimiterToken token) {
-        // lock
-        tokenStore.put(ipAddress, new AtomicReference<>(token));
-        // unlock
+        if (tokenStore.containsKey(ipAddress)) {
+            tokenStore.get(ipAddress).set(token);
+        } else {
+            tokenStore.put(ipAddress, new AtomicReference<>(token));
+        }
     }
 
     @Override
     public void getAndDecrement(String ipAddress) {
         AtomicReference<RateLimiterToken> tokenAtomicReference;
         RateLimiterToken rateLimiterToken;
-        do {
-            tokenStore.putIfAbsent(ipAddress,new AtomicReference<>(new RateLimiterToken(1,System.nanoTime())));
+
+        while (true) {
+            tokenStore.putIfAbsent(ipAddress, new AtomicReference<>(new RateLimiterToken(2, System.nanoTime())));
             tokenAtomicReference = tokenStore.get(ipAddress);
-            rateLimiterToken = new RateLimiterToken();
-            rateLimiterToken.setCount(tokenAtomicReference.get().getCount() - 1);
-            //actual , newValue
-        } while (!tokenAtomicReference.compareAndSet(tokenAtomicReference.get(), rateLimiterToken));
+            rateLimiterToken = new RateLimiterToken(tokenAtomicReference.get().getCount() - 1, System.nanoTime());
+            if (tokenAtomicReference.compareAndSet(tokenAtomicReference.get(), rateLimiterToken)) {
+                break;
+            }
+        }
     }
 }
